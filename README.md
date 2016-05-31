@@ -1,0 +1,15 @@
+# redis
+redis-sentinel 监控的主从复制配置
+
+sentinel客户端的切换过程：
+1.通过配置文件中的sentinel来获取master节点(每个sentinel服务中包含着所有的主、从服务器节点信息)
+2.根据配置的sentinel个数来创建对应个数的线程，每个线程模拟一个redis客户端，实时的在监测订阅的频道+switch-master发送的信息，
+如果有故障迁移，则会收到sentinel通过频道发布的信息，然后jedis会调用相应的factory,重新生成pool master redis
+
+
+#rediscluster
+rediscluster客户端切换过程
+每个redis节点都会生成一个对应的jedispool对象
+根据配置的HostAndPort列表去生成对应的redis客户端，分别获取该节点对应能处理的槽位，然后以slot-jedispool的结构存储redis连接对象
+某个solts对应有jedispool,根据Key的hash值，获取到对应的槽位，然后从对应槽位的jedispool中获取一个jedis链接
+
